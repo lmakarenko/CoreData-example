@@ -6,6 +6,7 @@
 //
 
 #import "AppDelegate.h"
+#import "Company+CoreDataClass.h"
 
 @interface AppDelegate ()
 
@@ -16,9 +17,72 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.context = self.persistentContainer.viewContext;
     return YES;
 }
 
+- (void)createCompany:(Company*)companyData {
+    // Company *company = [NSEntityDescription insertNewObjectForEntityForName:@"Company" inManagedObjectContext:self.context];
+    Company *company = [[Company alloc] initWithContext:self.context];
+    company.name = companyData.name;
+    company.ticker = companyData.ticker;
+    company.web = companyData.web;
+    company.address = companyData.address;
+    [self saveContext];
+}
+
+- (NSArray <Company*>*)fetchCompanies {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
+    NSArray<Company*> *companies = [self.context executeFetchRequest:request error:nil];
+    [self printCompaniesArray:companies];
+    return companies;
+}
+
+- (NSArray <Company *>*)fetchWithSort {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
+    NSSortDescriptor *ageDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+    request.sortDescriptors = @[ageDescriptor];
+    NSArray <Company*> *companies = [self.context executeFetchRequest:request error:nil];
+    [self printCompaniesArray:companies];
+    return companies;
+}
+
+- (NSArray <Company *>*)fetchWithFilter {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ticker = \"T\""];
+    request.predicate = predicate;
+    NSArray <Company*> *companies = [self.context executeFetchRequest:request error:nil];
+    [self printCompaniesArray:companies];
+    return companies;
+}
+
+//- (void)updateCompany:(Company*)companyData {
+//    Company *company = self.fetchCompanies[0];
+//    company.name = companyData.name;
+//    company.ticker = companyData.ticker;
+//    company.web = companyData.web;
+//    company.address = companyData.address;
+//    [self saveContext];
+//}
+
+- (void)deleteCompany:(Company*)company {
+//    NSArray <Company*>* companies = [self fetchWithFilter];
+//    Company *company = companies[0];
+    [self.context deleteObject:company];
+    [self saveContext];
+}
+
+- (void)printCompaniesArray:(NSArray <Company *>*)companies {
+    for(Company *company in companies) {
+        NSLog(@"%@", company.name);
+    }
+}
+
+#pragma mark - Core Data Stack
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    //[self saveContext];
+}
 
 #pragma mark - UISceneSession lifecycle
 
@@ -72,9 +136,8 @@
 #pragma mark - Core Data Saving support
 
 - (void)saveContext {
-    NSManagedObjectContext *context = self.persistentContainer.viewContext;
     NSError *error = nil;
-    if ([context hasChanges] && ![context save:&error]) {
+    if ([self.context hasChanges] && ![self.context save:&error]) {
         // Replace this implementation with code to handle the error appropriately.
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, error.userInfo);

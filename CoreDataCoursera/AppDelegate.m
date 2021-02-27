@@ -21,67 +21,10 @@
     return YES;
 }
 
-- (void)createCompany:(Company*)companyData {
-    // Company *company = [NSEntityDescription insertNewObjectForEntityForName:@"Company" inManagedObjectContext:self.context];
-    Company *company = [[Company alloc] initWithContext:self.context];
-    company.name = companyData.name;
-    company.ticker = companyData.ticker;
-    company.web = companyData.web;
-    company.address = companyData.address;
-    [self saveContext];
-}
-
-- (NSArray <Company*>*)fetchCompanies {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
-    NSArray<Company*> *companies = [self.context executeFetchRequest:request error:nil];
-    [self printCompaniesArray:companies];
-    return companies;
-}
-
-- (NSArray <Company *>*)fetchWithSort {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
-    NSSortDescriptor *ageDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
-    request.sortDescriptors = @[ageDescriptor];
-    NSArray <Company*> *companies = [self.context executeFetchRequest:request error:nil];
-    [self printCompaniesArray:companies];
-    return companies;
-}
-
-- (NSArray <Company *>*)fetchWithFilter {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Company"];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ticker = \"T\""];
-    request.predicate = predicate;
-    NSArray <Company*> *companies = [self.context executeFetchRequest:request error:nil];
-    [self printCompaniesArray:companies];
-    return companies;
-}
-
-//- (void)updateCompany:(Company*)companyData {
-//    Company *company = self.fetchCompanies[0];
-//    company.name = companyData.name;
-//    company.ticker = companyData.ticker;
-//    company.web = companyData.web;
-//    company.address = companyData.address;
-//    [self saveContext];
-//}
-
-- (void)deleteCompany:(Company*)company {
-//    NSArray <Company*>* companies = [self fetchWithFilter];
-//    Company *company = companies[0];
-    [self.context deleteObject:company];
-    [self saveContext];
-}
-
-- (void)printCompaniesArray:(NSArray <Company *>*)companies {
-    for(Company *company in companies) {
-        NSLog(@"%@", company.name);
-    }
-}
-
 #pragma mark - Core Data Stack
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    //[self saveContext];
+    [self saveContext];
 }
 
 #pragma mark - UISceneSession lifecycle

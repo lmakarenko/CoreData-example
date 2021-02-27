@@ -17,9 +17,5 @@
 
 - (void)saveContext;
 
-- (NSArray <Company*>*)fetchCompanies;
-- (void)createCompany:(Company*)companyData;
-- (void)deleteCompany:(Company*)company;
-
 @end
 
